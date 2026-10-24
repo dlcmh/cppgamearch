@@ -3,6 +3,9 @@
 # Tech stack: macOS, C++23, SDL3, Metal-cpp, Slang, GLM
 # ============================================
 
+# Vendored Metal-cpp headers (cloned during setup)
+third_party/metal-cpp/
+
 # ---- macOS System Files ----
 .DS_Store
 .AppleDouble
