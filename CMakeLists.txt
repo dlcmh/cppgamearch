@@ -26,3 +26,15 @@ target_link_libraries(sdl3metalwindow PRIVATE
     ${FOUNDATION_FRAMEWORK}
 )
 target_compile_options(sdl3metalwindow PRIVATE -Wall -Wextra -Wpedantic)
+
+add_executable(darkbluewindow src/apps/darkbluewindow/main.cpp)
+target_include_directories(darkbluewindow SYSTEM PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/metal-cpp
+)
+target_link_libraries(darkbluewindow PRIVATE
+    SDL3::SDL3
+    ${METAL_FRAMEWORK}
+    ${QUARTZCORE_FRAMEWORK}
+    ${FOUNDATION_FRAMEWORK}
+)
+target_compile_options(darkbluewindow PRIVATE -Wall -Wextra -Wpedantic)

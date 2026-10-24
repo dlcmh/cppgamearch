@@ -45,7 +45,10 @@ Verify with `ls third_party/metal-cpp/Metal/Metal.hpp`.
 After setting up a game's folder with `CMakeLists.txt`, do the following one-time vscode-related setup.
 
 ```sh
-# run this if build folder deleted or compile_commands.json needs to regenerated
+# run this if:
+# build folder deleted
+# compile_commands.json needs to regenerated
+# a new executable is added (which needs compile_commands.json to be regenerated)
 cmake -B build
 ```
 
@@ -62,6 +65,11 @@ In `.vscode/settings.json`:
 Build and run a specific target (eg sdl3window):
 
 ```sh
+# if new executable added
+cmake -B build && cmake --build build --target sdl3window
+
+# if re-compiling an existing executable
 cmake --build build --target sdl3window
+
 build/sdl3window
 ```
