@@ -8,3 +8,5 @@ Tech stack:
 - Slang shading language
 - SDL3 (Simple DirectMedia Layer)
 - OpenGL Mathematics (GLM)
+- CMake
+  - CMakeLists.txt
