@@ -24,9 +24,7 @@ Setup:
 
 After setting up a game's folder with `CMakeLists.txt`, do the following one-time vscode-related setup.
 
-```
-cd gamefolder
-
+```sh
 cmake -B build
 ```
 
@@ -38,4 +36,11 @@ In `.vscode/settings.json`:
         "--compile-commands-dir=build"
     ]
 }
+```
+
+Build and run:
+
+```sh
+cmake --build build
+build/cppgamearch
 ```
