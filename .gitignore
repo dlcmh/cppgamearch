@@ -81,6 +81,9 @@ DerivedData/
 .vscode/
 *.code-workspace
 
+# ---- clangd index cache ----
+.cache/
+
 # CLion / JetBrains
 .idea/
 *.iml
