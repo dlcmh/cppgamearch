@@ -7,7 +7,7 @@ int main(int, char**) {
     }
 
     SDL_Window* window = SDL_CreateWindow(
-        "cppgamearch",
+        "sdl3window",
         1280, 720,
         SDL_WINDOW_METAL // tells SDL we intend to render this window
                                // with Metal later

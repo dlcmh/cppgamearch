@@ -8,6 +8,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(SDL3 CONFIG REQUIRED)
 
-add_executable(cppgamearch src/main.cpp)
-target_link_libraries(cppgamearch PRIVATE SDL3::SDL3)
-target_compile_options(cppgamearch PRIVATE -Wall -Wextra -Wpedantic)
+add_executable(sdl3window src/apps/sdl3window/main.cpp)
+target_link_libraries(sdl3window PRIVATE SDL3::SDL3)
+target_compile_options(sdl3window PRIVATE -Wall -Wextra -Wpedantic)

@@ -25,7 +25,7 @@ Setup:
 After setting up a game's folder with `CMakeLists.txt`, do the following one-time vscode-related setup.
 
 ```sh
-cmake -B build
+cmake -B build # this also rebuilds a deleted build folder
 ```
 
 In `.vscode/settings.json`:
@@ -38,9 +38,9 @@ In `.vscode/settings.json`:
 }
 ```
 
-Build and run:
+Build and run a specific target (eg sdl3window):
 
 ```sh
-cmake --build build
-build/cppgamearch
+cmake --build build --target sdl3window
+build/sdl3window
 ```
