@@ -11,6 +11,9 @@ find_library(METAL_FRAMEWORK Metal REQUIRED)
 find_library(QUARTZCORE_FRAMEWORK QuartzCore REQUIRED)
 find_library(FOUNDATION_FRAMEWORK Foundation REQUIRED)
 
+add_executable(gameloopclass src/apps/gameloopclass/main.cpp)
+target_compile_options(gameloopclass PRIVATE -Wall -Wextra -Wpedantic)
+
 add_executable(chrspaceinvaders src/apps/chrspaceinvaders/main.cpp)
 target_compile_options(chrspaceinvaders PRIVATE -Wall -Wextra -Wpedantic)
 
