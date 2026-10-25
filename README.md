@@ -79,6 +79,12 @@ WarningsAsErrors: >
   modernize-make-unique,
   modernize-make-shared,
   modernize-use-using
+
+CheckOptions:
+  - key: readability-identifier-length.IgnoredVariableNames
+    value: 'dt|up|id|it'
+  - key: readability-identifier-length.IgnoredParameterNames
+    value: 'dt|up|id|it'
 ```
 
 `clang-format` formats code automatically with a consistent style. First, `brew install clang-format`. Next, create `.clang-format` file in project root:

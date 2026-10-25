@@ -12,3 +12,9 @@ WarningsAsErrors: >
   modernize-make-unique,
   modernize-make-shared,
   modernize-use-using
+
+CheckOptions:
+  - key: readability-identifier-length.IgnoredVariableNames
+    value: 'dt|up|id|it'
+  - key: readability-identifier-length.IgnoredParameterNames
+    value: 'dt|up|id|it'

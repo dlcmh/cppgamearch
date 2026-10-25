@@ -11,6 +11,9 @@ find_library(METAL_FRAMEWORK Metal REQUIRED)
 find_library(QUARTZCORE_FRAMEWORK QuartzCore REQUIRED)
 find_library(FOUNDATION_FRAMEWORK Foundation REQUIRED)
 
+add_executable(chrspaceinvaders src/apps/chrspaceinvaders/main.cpp)
+target_compile_options(chrspaceinvaders PRIVATE -Wall -Wextra -Wpedantic)
+
 add_executable(sdl3window src/apps/sdl3window/main.cpp)
 target_link_libraries(sdl3window PRIVATE SDL3::SDL3)
 target_compile_options(sdl3window PRIVATE -Wall -Wextra -Wpedantic)
