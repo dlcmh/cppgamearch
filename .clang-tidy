@@ -1,0 +1,14 @@
+Checks: >
+  -*,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -modernize-use-trailing-return-type,
+  -cppcoreguidelines-avoid-magic-numbers
+
+WarningsAsErrors: >
+  cppcoreguidelines-owning-memory,
+  modernize-make-unique,
+  modernize-make-shared,
+  modernize-use-using

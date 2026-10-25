@@ -81,7 +81,7 @@ DerivedData/
 
 # ---- IDE / Editor Files ----
 # Visual Studio Code
-.vscode/
+# .vscode/
 *.code-workspace
 
 # ---- clangd index cache ----

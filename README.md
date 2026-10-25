@@ -20,7 +20,7 @@ Tech stack:
 
 ### Setup:
 
-Install SDL3 with:
+Install **SDL3** with:
 
 ```sh
 brew install sdl3
@@ -62,7 +62,56 @@ In `.vscode/settings.json`:
 }
 ```
 
-Build and run a specific target (eg sdl3window):
+`clang-tidy` enforces modern C++ and Core Guidelines. Create `.clang-tidy` file in project root:
+
+```yaml
+Checks: >
+  -*,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -modernize-use-trailing-return-type,
+  -cppcoreguidelines-avoid-magic-numbers
+
+WarningsAsErrors: >
+  cppcoreguidelines-owning-memory,
+  modernize-make-unique,
+  modernize-make-shared,
+  modernize-use-using
+```
+
+`clang-format` formats code automatically with a consistent style. First, `brew install clang-format`. Next, create `.clang-format` file in project root:
+
+```yaml
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+```
+
+And in `.vscode/settings.json`, add:
+
+```json
+"clangd.arguments": [
+    "--compile-commands-dir=build"
+],
+"[cpp]": {
+    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+    "editor.formatOnSave": true
+},
+"[c]": {
+    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+    "editor.formatOnSave": true
+},
+```
+
+- `editor.defaultFormatter`: This tells VSCode to use the clangd extension as the formatter for C and C++ files. Clangd uses the `clang-format` engine, which respects your project's `.clang-format` file.
+- `editor.formatOnSave`: This triggers the formatter automatically whenever you press `Cmd+S`.
+
+
+**Build and run a specific target (eg sdl3window):**
 
 ```sh
 # if new executable added
