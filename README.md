@@ -20,6 +20,12 @@ Tech stack:
 
 ### Setup:
 
+In `.zshrc`:
+
+```sh
+alias clang++='clang++ -std=c++23'
+```
+
 Install **SDL3** with:
 
 ```sh
@@ -85,6 +91,8 @@ CheckOptions:
     value: 'dt|up|id|it'
   - key: readability-identifier-length.IgnoredParameterNames
     value: 'dt|up|id|it'
+  - key: readability-identifier-length.IgnoredLoopCounterNames
+    value: '^[ijkxy_]$'
 ```
 
 `clang-format` formats code automatically with a consistent style. First, `brew install clang-format`. Next, create `.clang-format` file in project root:
@@ -94,7 +102,9 @@ BasedOnStyle: LLVM
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
-ColumnLimit: 100
+ColumnLimit: 80
+DerivePointerAlignment: false
+PointerAlignment: Left
 ```
 
 And in `.vscode/settings.json`, add:

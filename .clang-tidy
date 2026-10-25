@@ -17,4 +17,6 @@ CheckOptions:
   - key: readability-identifier-length.IgnoredVariableNames
     value: 'dt|up|id|it'
   - key: readability-identifier-length.IgnoredParameterNames
-    value: 'dt|up|id|it'
+    value: 'dt|up|id|it|x|y|v'
+  - key: readability-identifier-length.IgnoredLoopCounterNames
+    value: '^[ijkxy_]$'
