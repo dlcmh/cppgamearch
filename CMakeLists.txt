@@ -41,6 +41,9 @@ add_executable(chrspaceinvaders src/apps/chrspaceinvaders/main.cpp)
 add_executable(sdl3window src/apps/sdl3window/main.cpp)
 target_link_libraries(sdl3window PRIVATE SDL3::SDL3)
 
+add_executable(justsdl3 src/apps/justsdl3/main.cpp)
+target_link_libraries(justsdl3 PRIVATE ${APPLE_METAL_LIBS})
+
 add_executable(sdl3metalwindow src/apps/sdl3metalwindow/main.cpp)
 target_include_directories(sdl3metalwindow SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/metal-cpp)
 target_link_libraries(sdl3metalwindow PRIVATE ${APPLE_METAL_LIBS})
