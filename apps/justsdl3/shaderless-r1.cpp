@@ -24,6 +24,44 @@ constexpr SDL_FRect kCircleDemo{500.0F, 200.0F, 60.0F,
 constexpr SDL_FRect kLineDemo{200.0F, 400.0F, 600.0F, 500.0F}; // x1,y1,x2,y2
 } // namespace config
 
+// -----------------------------------------------------------------------------
+// RAII guard for SDL
+// -----------------------------------------------------------------------------
+
+class SdlGuard {
+  public:
+    SdlGuard() {
+        if (!SDL_Init(SDL_INIT_VIDEO)) {
+            sdl::log("SDL_Init failed: %s", SDL_GetError());
+            ok_ = false;
+        }
+    }
+    ~SdlGuard() {
+        if (ok_) { // Why if (ok_)? If SDL_Init failed, SDL was never
+                   // initialized. Calling SDL_Quit() on a library that was
+                   // never initialized is at best a no-op and at worst
+                   // undefined. The flag we set in the constructor tells us:
+                   // "only clean up what we actually acquired." This is the
+                   // standard RAII pattern — the destructor mirrors the
+                   // constructor, but only releases what was successfully
+                   // acquired.
+            SDL_Quit();
+        }
+    }
+
+    // Copying/moving would mean two objects think they own SDL.
+    // Forbid it (same reasoning as your Shape base class).
+    SdlGuard(const SdlGuard&) = delete;
+    SdlGuard& operator=(const SdlGuard&) = delete;
+    SdlGuard(const SdlGuard&&) = delete;
+    SdlGuard& operator=(SdlGuard&&) = delete;
+
+    [[nodiscard]] bool ok() const { return ok_; }
+
+  private:
+    bool ok_ = true;
+};
+
 // ---------------------------------------------------------------------------
 // Shape hierarchy
 // ---------------------------------------------------------------------------
@@ -139,10 +177,10 @@ namespace {
 // RAII wrappers so we don't have to remember cleanup order on every early
 // return.
 struct WindowDeleter {
-    void operator()(SDL_Window* w) const noexcept { SDL_DestroyWindow(w); }
+    void operator()(SDL_Window* w) const { SDL_DestroyWindow(w); }
 };
 struct RendererDeleter {
-    void operator()(SDL_Renderer* r) const noexcept { SDL_DestroyRenderer(r); }
+    void operator()(SDL_Renderer* r) const { SDL_DestroyRenderer(r); }
 };
 
 using WindowPtr = std::unique_ptr<SDL_Window, WindowDeleter>;
@@ -169,8 +207,8 @@ std::vector<std::unique_ptr<Shape>> buildScene() {
 } // namespace
 
 int main() {
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
-        sdl::log("SDL_Init failed: %s", SDL_GetError());
+    SdlGuard sdl;
+    if (!sdl.ok()) {
         return 1;
     }
 
@@ -224,6 +262,6 @@ int main() {
     }
 
     // No manual cleanup loop needed — unique_ptr handles it.
-    SDL_Quit();
+
     return 0;
 }
