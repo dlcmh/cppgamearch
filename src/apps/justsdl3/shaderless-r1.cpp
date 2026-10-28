@@ -40,6 +40,7 @@ class Shape {
     Shape& operator=(Shape&&) = delete;
 
     virtual void draw(SDL_Renderer* renderer) const = 0;
+    virtual void update(float /*deltaSeconds*/) {}
 };
 
 class Rect final : public Shape {
@@ -85,10 +86,27 @@ class Circle final : public Shape {
         }
     }
 
+    void update(float deltaSeconds) override {
+        constexpr float kSpeed = 80.0F; // px per second
+        const float radius = radius_;
+        const float minY = radius;
+        const float maxY = static_cast<float>(config::kWindowHeight) - radius;
+
+        centerY_ += direction_ * kSpeed * deltaSeconds;
+        if (centerY_ <= minY) {
+            centerY_ = minY;
+            direction_ = 1.0F;
+        } else if (centerY_ >= maxY) {
+            centerY_ = maxY;
+            direction_ = -1.0F;
+        }
+    }
+
   private:
     float centerX_;
     float centerY_;
     float radius_;
+    float direction_ = -1.0F;
     SDL_Color color_;
 };
 
@@ -175,11 +193,22 @@ int main() {
 
     bool running = true;
     SDL_Event event;
+
+    auto lastTicks = SDL_GetTicks();
+
     while (running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 running = false;
             }
+        }
+
+        const auto now = SDL_GetTicks();
+        const auto deltaSeconds = static_cast<float>(now - lastTicks) / 1000.0F;
+        lastTicks = now;
+
+        for (const auto& shape : shapes) {
+            shape->update(deltaSeconds);
         }
 
         SDL_SetRenderDrawColor(renderer.get(), config::kBackground.r,
