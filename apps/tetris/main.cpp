@@ -1,9 +1,11 @@
 #include "sdl_log.hpp"
 #include <SDL3/SDL.h>
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <memory>
 #include <numbers>
+#include <optional>
 #include <vector>
 
 namespace config {
@@ -60,6 +62,62 @@ class SdlGuard {
 
   private:
     bool ok_ = true;
+};
+
+// -----------------------------------------------------------------------------
+// Playfield: a grid of cells. Empty cells are represented by std::nullopt.
+// -----------------------------------------------------------------------------
+
+namespace config {
+constexpr int kBoardWidth = 10;  // columns
+constexpr int kBoardHeight = 20; // rows
+// constexpr float kCellSize = 24.0F; // pixels per cell
+} // namespace config
+
+class Board {
+  public:
+    // Returns true if the cell is empty (in-bounds).
+    [[nodiscard]] bool isEmpty(int col, int row) const {
+        if (col < 0 || col >= config::kBoardWidth) {
+            return false;
+        }
+        if (row < 0 || row >= config::kBoardHeight) {
+            return false;
+        }
+        return !cells_.at(static_cast<size_t>(row))
+                    .at(static_cast<size_t>(col))
+                    .has_value();
+    }
+
+    // Fill a cell. Caller must ensure it's in-bounds.
+    void set(int col, int row, SDL_Color color) {
+        cells_.at(static_cast<size_t>(row)).at(static_cast<size_t>(col)) =
+            color;
+    }
+
+    // Clear a cell.
+    void clear(int col, int row) {
+        cells_.at(static_cast<size_t>(row))
+            .at(static_cast<size_t>(col))
+            .reset();
+    }
+
+  private:
+    // std::optional<SDL_Color> per cell: "empty" vs "filled with color".
+
+    /*  Original C-style array flagged by clang-tidy
+     *  ============================================
+     *  std::optional<SDL_Color> cells_[config::kBoardHeight]
+     *                                 [config::kBoardWidth];
+     */
+
+    using Row = std::array<std::optional<SDL_Color>, config::kBoardWidth>;
+    std::array<Row, config::kBoardHeight>
+        cells_{}; // cells_{} — the {} value-initializes every cell to
+                  // std::nullopt (default-constructed optional). Without it,
+                  // the optionals would still be default-constructed (they're a
+                  // class type), but writing {} is clearer and matches the
+                  // "always initialize" guideline.
 };
 
 // ---------------------------------------------------------------------------
