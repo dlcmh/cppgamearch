@@ -33,6 +33,8 @@ set(APPLE_METAL_LIBS
 )
 
 # --- Define Your Apps cleanly ---
+add_executable(tetris apps/tetris/main.cpp)
+target_link_libraries(tetris PRIVATE ${APPLE_METAL_LIBS})
 
 add_executable(gameloopclass apps/gameloopclass/main.cpp)
 
