@@ -15,8 +15,8 @@ WarningsAsErrors: >
 
 CheckOptions:
   - key: readability-identifier-length.IgnoredVariableNames
-    value: 'dt|up|id|it'
+    value: 'dt|ok|up|id|it|w'
   - key: readability-identifier-length.IgnoredParameterNames
-    value: 'dt|up|id|it|x|y|v'
+    value: 'd|dt|up|id|it|w|x|y|v'
   - key: readability-identifier-length.IgnoredLoopCounterNames
     value: '^[ijkxy_]$'
