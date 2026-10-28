@@ -34,26 +34,26 @@ set(APPLE_METAL_LIBS
 
 # --- Define Your Apps cleanly ---
 
-add_executable(gameloopclass src/apps/gameloopclass/main.cpp)
+add_executable(gameloopclass apps/gameloopclass/main.cpp)
 
-add_executable(chrspaceinvaders src/apps/chrspaceinvaders/main.cpp)
+add_executable(chrspaceinvaders apps/chrspaceinvaders/main.cpp)
 
-add_executable(sdl3window src/apps/sdl3window/main.cpp)
+add_executable(sdl3window apps/sdl3window/main.cpp)
 target_link_libraries(sdl3window PRIVATE SDL3::SDL3)
 
-add_executable(justsdl3 src/apps/justsdl3/main.cpp)
+add_executable(justsdl3 apps/justsdl3/main.cpp)
 target_link_libraries(justsdl3 PRIVATE ${APPLE_METAL_LIBS})
-add_executable(justsdl3-refactored src/apps/justsdl3/main-refactored.cpp)
+add_executable(justsdl3-refactored apps/justsdl3/main-refactored.cpp)
 target_link_libraries(justsdl3-refactored PRIVATE ${APPLE_METAL_LIBS})
-add_executable(shaderless src/apps/justsdl3/shaderless.cpp)
+add_executable(shaderless apps/justsdl3/shaderless.cpp)
 target_link_libraries(shaderless PRIVATE ${APPLE_METAL_LIBS})
-add_executable(shaderless-r1 src/apps/justsdl3/shaderless-r1.cpp)
+add_executable(shaderless-r1 apps/justsdl3/shaderless-r1.cpp)
 target_link_libraries(shaderless-r1 PRIVATE ${APPLE_METAL_LIBS})
 
-add_executable(sdl3metalwindow src/apps/sdl3metalwindow/main.cpp)
+add_executable(sdl3metalwindow apps/sdl3metalwindow/main.cpp)
 target_include_directories(sdl3metalwindow SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/metal-cpp)
 target_link_libraries(sdl3metalwindow PRIVATE ${APPLE_METAL_LIBS})
 
-add_executable(darkbluewindow src/apps/darkbluewindow/main.cpp)
+add_executable(darkbluewindow apps/darkbluewindow/main.cpp)
 target_include_directories(darkbluewindow SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/metal-cpp)
 target_link_libraries(darkbluewindow PRIVATE ${APPLE_METAL_LIBS})
