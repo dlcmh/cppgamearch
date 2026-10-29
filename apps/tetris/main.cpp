@@ -3,66 +3,11 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <numbers>
 #include <optional>
 #include <vector>
-
-namespace config {
-constexpr int kWindowWidth = 800;
-constexpr int kWindowHeight = 600;
-constexpr int kCircleSegments = 60;
-
-constexpr SDL_Color kPink{255, 0, 200, 255};
-constexpr SDL_Color kGold{255, 200, 60, 255};
-constexpr SDL_Color kCoral{255, 120, 100, 255};
-constexpr SDL_Color kDarkTeal{0, 90, 90, 255};
-constexpr SDL_Color kBackground{kDarkTeal};
-
-// Scene layout (kept together so the demo is easy to tweak).
-constexpr SDL_FRect kRectDemo{100.0F, 100.0F, 150.0F, 100.0F};
-constexpr SDL_FRect kCircleDemo{500.0F, 200.0F, 60.0F,
-                                60.0F}; // x,y,radius,unused
-constexpr SDL_FRect kLineDemo{200.0F, 400.0F, 600.0F, 500.0F}; // x1,y1,x2,y2
-} // namespace config
-
-// -----------------------------------------------------------------------------
-// RAII guard for SDL
-// -----------------------------------------------------------------------------
-
-class SdlGuard {
-  public:
-    SdlGuard() {
-        if (!SDL_Init(SDL_INIT_VIDEO)) {
-            sdl::log("SDL_Init failed: %s", SDL_GetError());
-            ok_ = false;
-        }
-    }
-    ~SdlGuard() {
-        if (ok_) { // Why if (ok_)? If SDL_Init failed, SDL was never
-                   // initialized. Calling SDL_Quit() on a library that was
-                   // never initialized is at best a no-op and at worst
-                   // undefined. The flag we set in the constructor tells us:
-                   // "only clean up what we actually acquired." This is the
-                   // standard RAII pattern — the destructor mirrors the
-                   // constructor, but only releases what was successfully
-                   // acquired.
-            SDL_Quit();
-        }
-    }
-
-    // Copying/moving would mean two objects think they own SDL.
-    // Forbid it (same reasoning as your Shape base class).
-    SdlGuard(const SdlGuard&) = delete;
-    SdlGuard& operator=(const SdlGuard&) = delete;
-    SdlGuard(const SdlGuard&&) = delete;
-    SdlGuard& operator=(SdlGuard&&) = delete;
-
-    [[nodiscard]] bool ok() const { return ok_; }
-
-  private:
-    bool ok_ = true;
-};
 
 // -----------------------------------------------------------------------------
 // Playfield: a grid of cells. Empty cells are represented by std::nullopt.
@@ -118,6 +63,238 @@ class Board {
                   // the optionals would still be default-constructed (they're a
                   // class type), but writing {} is clearer and matches the
                   // "always initialize" guideline.
+};
+
+// 2. The Falling Tetromino: model, spawn, collision
+
+// 2A. Represent a Tetromino's Shape
+
+// A cell offset within the piece, relative to the piece's anchor.
+struct CellOffset {
+    int col;
+    int row;
+};
+
+// 4 cells per rotation state, 4 rotation states per piece.
+using RotationState = std::array<CellOffset, 4>;
+using ShapeTable = std::array<RotationState, 4>;
+
+enum class PieceType : uint8_t { I, O, T, S, Z, J, L };
+
+namespace {
+
+// All 7 tetrominoes, each in 4 rotation states, each state = 4 cell offsets.
+// Offsets are relative to the anchor (anchor = top-left of the piece's bounding
+// box). Rotations follow the SRS convention: states cycle 0→1→2→3.
+constexpr std::array<ShapeTable, 7> kShapes = {{
+    // I
+    {{
+        {{{0, 1}, {1, 1}, {2, 1}, {3, 1}}}, // state 0: horizontal
+        {{{2, 0}, {2, 1}, {2, 2}, {2, 3}}}, // state 1: vertical
+        {{{0, 2}, {1, 2}, {2, 2}, {3, 2}}}, // state 2: horizontal (shifted)
+        {{{1, 0}, {1, 1}, {1, 2}, {1, 3}}}, // state 3: vertical (shifted)
+    }},
+    // O
+    {{
+        {{{1, 0}, {2, 0}, {1, 1}, {2, 1}}}, // state 0
+        {{{1, 0}, {2, 0}, {1, 1}, {2, 1}}}, // state 1 (identical)
+        {{{1, 0}, {2, 0}, {1, 1}, {2, 1}}}, // state 2 (identical)
+        {{{1, 0}, {2, 0}, {1, 1}, {2, 1}}}, // state 3 (identical)
+    }},
+    // T
+    {{
+        {{{1, 0}, {0, 1}, {1, 1}, {2, 1}}}, // state 0: pointing up
+        {{{1, 0}, {1, 1}, {2, 1}, {1, 2}}}, // state 0: pointing right
+        {{{0, 1}, {1, 1}, {2, 1}, {1, 2}}}, // state 0: pointing down
+        {{{1, 0}, {0, 1}, {1, 1}, {1, 2}}}, // state 0: pointing left
+    }},
+    // S
+    {{
+        {{{1, 0}, {2, 0}, {0, 1}, {1, 1}}}, // state 0: pointing up
+        {{{1, 0}, {1, 1}, {2, 1}, {2, 2}}}, // state 0: pointing right
+        {{{0, 1}, {1, 1}, {2, 1}, {1, 2}}}, // state 0: pointing down
+        {{{1, 0}, {0, 1}, {1, 1}, {1, 2}}}, // state 0: pointing left
+    }},
+    // Z
+    {{
+        {{{0, 0}, {1, 0}, {1, 1}, {2, 1}}}, // state 0: pointing up
+        {{{2, 0}, {1, 1}, {2, 1}, {1, 2}}}, // state 0: pointing right
+        {{{0, 1}, {1, 1}, {1, 2}, {2, 2}}}, // state 0: pointing down
+        {{{1, 0}, {0, 1}, {1, 1}, {0, 2}}}, // state 0: pointing left
+    }},
+    // J
+    {{
+        {{{0, 0}, {0, 1}, {1, 1}, {2, 1}}}, // state 0: pointing up
+        {{{1, 0}, {2, 0}, {1, 1}, {1, 2}}}, // state 0: pointing right
+        {{{0, 1}, {1, 1}, {2, 1}, {2, 2}}}, // state 0: pointing down
+        {{{1, 0}, {1, 1}, {0, 2}, {1, 2}}}, // state 0: pointing left
+    }},
+    // L
+    {{
+        {{{2, 0}, {0, 1}, {1, 1}, {2, 1}}}, // state 0: pointing up
+        {{{1, 0}, {1, 1}, {1, 2}, {2, 2}}}, // state 0: pointing right
+        {{{0, 1}, {1, 1}, {2, 1}, {0, 2}}}, // state 0: pointing down
+        {{{0, 0}, {1, 0}, {1, 1}, {1, 2}}}, // state 0: pointing left
+    }},
+}};
+
+} // namespace
+
+// end 2A. Represent a Tetromino's Shape
+
+// 2B. The Tetromino Type
+
+class Tetromino {
+  public:
+    Tetromino(PieceType type, int anchorCol, int anchorRow, int rotation,
+              SDL_Color color)
+        : type_(type), anchorCol_(anchorCol), anchorRow_(anchorRow),
+          rotation_(rotation), color_(color) {}
+
+    // The four cell offsets for the current rotation state.
+    [[nodiscard]] const RotationState& offsets() const {
+        return kShapes.at(static_cast<size_t>(type_))
+            .at(static_cast<size_t>(rotation_));
+    }
+
+    // Absolute board position of cell i (i in [0, 4]).
+    [[nodiscard]] CellOffset cellAt(int i) const {
+        const CellOffset off = offsets().at(static_cast<size_t>(i));
+        return {anchorCol_ + off.col, anchorRow_ + off.row};
+    }
+
+    [[nodiscard]] SDL_Color color() const { return color_; }
+
+    void moveLeft() { --anchorCol_; }
+    void moveRight() { ++anchorCol_; }
+    void moveDown() { ++anchorRow_; }
+
+    void rotateCW() { rotation_ = (rotation_ + 1) % 4; }
+    void rotateCCW() {
+        rotation_ = (rotation_ + 3) % 4;
+    } // / Add 3 (≡ −1 mod 4) instead of subtracting 1, so the operand stays
+      // non-negative and % 4 never yields a negative index.
+
+  private:
+    PieceType type_;
+    int anchorCol_;
+    int anchorRow_;
+    int rotation_ = 0; // the rotation state (0-3)
+    SDL_Color color_;
+};
+
+// end 2B. The Tetromino Type
+
+// 2C. Spawn Colors
+
+namespace {
+
+SDL_Color colorFor(PieceType type) {
+    switch (type) {
+    case PieceType::I:
+        return SDL_Color{0, 240, 240, 255}; // cyan
+    case PieceType::O:
+        return SDL_Color{240, 240, 0, 255}; // yellow
+    case PieceType::T:
+        return SDL_Color{160, 0, 240, 255}; // purple
+    case PieceType::S:
+        return SDL_Color{0, 240, 0, 255}; // green
+    case PieceType::Z:
+        return SDL_Color{240, 0, 0, 255}; // red
+    case PieceType::J:
+        return SDL_Color{0, 0, 240, 255}; // blue
+    case PieceType::L:
+        return SDL_Color{240, 160, 0, 255}; // orange
+    }
+} // namespace
+
+// end 2C. Spawn Colors
+
+// 2D. Collision Against the Board
+
+namespace {
+// Test a hypothetical move (eg -1, 0 for move left) to see if a piece will fit.
+// The piece will fit if the end position does not overlap any filled cell or
+// the board edge.
+bool fitsAt(const Board& board, const Tetromino& piece, int dCol, int dRow) {
+    for (int i = 0; i < 4; ++i) {
+        const CellOffset c = piece.cellAt(i);
+        if (!board.isEmpty(c.col + dCol, c.row + dRow)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Returns true if `piece` placed at its current position (0, 0) does not
+// overlap any filled cell or the board edges.
+bool canPlace(const Board& board, const Tetromino& piece) {
+    return fitsAt(board, piece, 0, 0);
+}
+} // namespace
+
+// end 2D. Collision Against the Board
+
+// end 2. The Falling Tetromino: model, spawn, collision
+
+// -----------------------------------------------------------------------------
+// TODO: Delete once no longer needed
+// -----------------------------------------------------------------------------
+
+namespace config {
+constexpr int kWindowWidth = 800;
+constexpr int kWindowHeight = 600;
+constexpr int kCircleSegments = 60;
+
+constexpr SDL_Color kPink{255, 0, 200, 255};
+constexpr SDL_Color kGold{255, 200, 60, 255};
+constexpr SDL_Color kCoral{255, 120, 100, 255};
+constexpr SDL_Color kDarkTeal{0, 90, 90, 255};
+constexpr SDL_Color kBackground{kDarkTeal};
+
+// Scene layout (kept together so the demo is easy to tweak).
+constexpr SDL_FRect kRectDemo{100.0F, 100.0F, 150.0F, 100.0F};
+constexpr SDL_FRect kCircleDemo{500.0F, 200.0F, 60.0F,
+                                60.0F}; // x,y,radius,unused
+constexpr SDL_FRect kLineDemo{200.0F, 400.0F, 600.0F, 500.0F}; // x1,y1,x2,y2
+} // namespace config
+
+// -----------------------------------------------------------------------------
+// RAII guard for SDL
+// -----------------------------------------------------------------------------
+
+class SdlGuard {
+  public:
+    SdlGuard() {
+        if (!SDL_Init(SDL_INIT_VIDEO)) {
+            sdl::log("SDL_Init failed: %s", SDL_GetError());
+            ok_ = false;
+        }
+    }
+    ~SdlGuard() {
+        if (ok_) { // Why if (ok_)? If SDL_Init failed, SDL was never
+                   // initialized. Calling SDL_Quit() on a library that was
+                   // never initialized is at best a no-op and at worst
+                   // undefined. The flag we set in the constructor tells us:
+                   // "only clean up what we actually acquired." This is the
+                   // standard RAII pattern — the destructor mirrors the
+                   // constructor, but only releases what was successfully
+                   // acquired.
+            SDL_Quit();
+        }
+    }
+
+    // Copying/moving would mean two objects think they own SDL.
+    // Forbid it (same reasoning as your Shape base class).
+    SdlGuard(const SdlGuard&) = delete;
+    SdlGuard& operator=(const SdlGuard&) = delete;
+    SdlGuard(const SdlGuard&&) = delete;
+    SdlGuard& operator=(SdlGuard&&) = delete;
+
+    [[nodiscard]] bool ok() const { return ok_; }
+
+  private:
+    bool ok_ = true;
 };
 
 // ---------------------------------------------------------------------------
