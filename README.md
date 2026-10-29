@@ -78,21 +78,15 @@ Checks: >
   performance-*,
   readability-*,
   -modernize-use-trailing-return-type,
-  -cppcoreguidelines-avoid-magic-numbers
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-magic-numbers,
+  -readability-identifier-length
 
 WarningsAsErrors: >
   cppcoreguidelines-owning-memory,
   modernize-make-unique,
   modernize-make-shared,
   modernize-use-using
-
-CheckOptions:
-  - key: readability-identifier-length.IgnoredVariableNames
-    value: 'dt|up|id|it'
-  - key: readability-identifier-length.IgnoredParameterNames
-    value: 'dt|up|id|it'
-  - key: readability-identifier-length.IgnoredLoopCounterNames
-    value: '^[ijkxy_]$'
 ```
 
 `clang-format` formats code automatically with a consistent style. First, `brew install clang-format`. Next, create `.clang-format` file in project root:
