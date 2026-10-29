@@ -80,7 +80,8 @@ Checks: >
   -modernize-use-trailing-return-type,
   -cppcoreguidelines-avoid-magic-numbers,
   -readability-magic-numbers,
-  -readability-identifier-length
+  -readability-identifier-length,
+  -modernize-use-designated-initializers
 
 WarningsAsErrors: >
   cppcoreguidelines-owning-memory,
