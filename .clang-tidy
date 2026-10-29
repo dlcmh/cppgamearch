@@ -5,18 +5,12 @@ Checks: >
   performance-*,
   readability-*,
   -modernize-use-trailing-return-type,
-  -cppcoreguidelines-avoid-magic-numbers
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-magic-numbers,
+  -readability-identifier-length
 
 WarningsAsErrors: >
   cppcoreguidelines-owning-memory,
   modernize-make-unique,
   modernize-make-shared,
   modernize-use-using
-
-CheckOptions:
-  - key: readability-identifier-length.IgnoredVariableNames
-    value: 'dt|ok|up|id|it|w'
-  - key: readability-identifier-length.IgnoredParameterNames
-    value: 'd|dt|up|id|it|r|w|x|y|v'
-  - key: readability-identifier-length.IgnoredLoopCounterNames
-    value: '^[ijkxy_]$'

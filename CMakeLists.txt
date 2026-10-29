@@ -1,4 +1,18 @@
 cmake_minimum_required(VERSION 3.28)
+
+# Force Homebrew LLVM before project() so it takes effect
+if(APPLE)
+    # ARM
+    if(EXISTS "/opt/homebrew/opt/llvm/bin/clang++")
+        set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin/clang++")
+        set(CMAKE_C_COMPILER "/opt/homebrew/opt/llvm/bin/clang")
+    # Intel
+    elseif(EXISTS "/usr/local/opt/llvm/bin/clang++")
+        set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
+        set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
+    endif()
+endif()
+
 project(cppgamearch LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -31,6 +45,9 @@ set(APPLE_METAL_LIBS
     ${QUARTZCORE_FRAMEWORK}
     ${FOUNDATION_FRAMEWORK}
 )
+
+# --- Define Briefly demos cleanly ---
+add_executable(enumerator briefly/enumerator.cpp)
 
 # --- Define Your Apps cleanly ---
 add_executable(tetris apps/tetris/main.cpp)
