@@ -146,10 +146,13 @@ constexpr std::array<ShapeTable, 7> kShapes = {{
 
 class Tetromino {
   public:
-    Tetromino(PieceType type, int anchorCol, int anchorRow, int rotation,
-              SDL_Color color)
+    Tetromino() = default;
+
+    Tetromino(PieceType type, int anchorCol, int anchorRow, SDL_Color color,
+              int rotation = 0)
         : type_(type), anchorCol_(anchorCol), anchorRow_(anchorRow),
-          rotation_(rotation), color_(color) {}
+          rotation_((rotation % 4 + 4) % 4), // normalize to [0, 3]
+          color_(color) {}
 
     // The four cell offsets for the current rotation state.
     [[nodiscard]] const RotationState& offsets() const {
@@ -176,18 +179,16 @@ class Tetromino {
       // non-negative and % 4 never yields a negative index.
 
   private:
-    PieceType type_;
-    int anchorCol_;
-    int anchorRow_;
+    PieceType type_ = PieceType::I;
+    int anchorCol_ = 0;
+    int anchorRow_ = 0;
     int rotation_ = 0; // the rotation state (0-3)
-    SDL_Color color_;
+    SDL_Color color_{0, 0, 0, 0};
 };
 
 // end 2B. The Tetromino Type
 
 // 2C. Spawn Colors
-
-namespace {
 
 SDL_Color colorFor(PieceType type) {
     switch (type) {
@@ -236,6 +237,105 @@ bool canPlace(const Board& board, const Tetromino& piece) {
 // end 2D. Collision Against the Board
 
 // end 2. The Falling Tetromino: model, spawn, collision
+
+// 3. Spawn, Input, Gravity, and Locking
+
+// 3a. The Game struct
+
+class Game {
+  public:
+    Game() { spawnPiece(); }
+
+    // Called once per frame with elapsed seconds.
+    void update(float dt) {
+        if (!hasActivePiece_) {
+            return;
+        }
+
+        gravityAccumulator_ += dt;
+        if (gravityAccumulator_ >= gravityInterval_) {
+            gravityAccumulator_ -= gravityInterval_;
+            tryMove(0, +1);
+        }
+    }
+
+    // Called for each key-down event. Returns true if the key was consumed.
+    bool handeKey(SDL_Keycode key) {
+        if (!hasActivePiece_) {
+            return false;
+        }
+
+        switch (key) {
+        case SDLK_LEFT:
+            tryMove(-1, 0);
+            return true;
+        case SDLK_RIGHT:
+            tryMove(+1, 0);
+            return true;
+        case SDLK_DOWN:
+            tryMove(0, +1);
+            return true; // soft drop
+        case SDLK_UP:
+            tryRotateCW();
+            return true; // soft drop
+        case SDLK_SPACE:
+            hardDrop();
+            return true; // soft drop
+        default:
+            return false;
+        }
+    }
+
+    [[nodiscard]] const Board& board() const { return board_; }
+    [[nodiscard]] const Tetromino& activePiece() const { return piece_; }
+    [[nodiscard]] bool hasActivePiece() const { return hasActivePiece_; }
+
+  private:
+    void spawnPiece() {
+        // Spawn in the middle-top. For now always 'T' - we'll randomize later.
+        const PieceType type = PieceType::T;
+        const int spawnCol = (config::kBoardWidth / 2) - 2; // roughly centered
+        const int spawnRow = 0;
+
+        piece_ = Tetromino(type, spawnCol, spawnRow, colorFor(type));
+    };
+
+    void tryMove(int dCol, int dRow) {
+        if (fitsAt(board_, piece_, dCol, dRow)) {
+            if (dCol < 0) {
+                piece_.moveLeft();
+            }
+            if (dCol > 0) {
+                piece_.moveRight();
+            }
+            if (dRow > 0) {
+                piece_.moveDown();
+            }
+        } else if (dRow > 0) {
+            // Can't move down → lock the piece into the board.
+            lockPiece();
+        }
+    }
+
+    void tryRotateCW() {
+        // Rotate, check fit; if it doesn't fit, undo.
+        // (No wall-kicks yet - that's a later refinement.)
+        if (canPlace(board_, piece_)) {
+        }
+    };
+    void hardDrop();
+    void lockPiece();
+
+    Board board_;
+    Tetromino piece_; // placeholder
+    bool hasActivePiece_ = false;
+    float gravityAccumulator_ = 0.0F;
+    float gravityInterval_ = 0.5F; // seconds per gravity step (adjust for feel)
+};
+
+// end 3a. The Game struct
+
+// end 3. Spawn, Input, Gravity, and Locking
 
 // -----------------------------------------------------------------------------
 // TODO: Delete once no longer needed
