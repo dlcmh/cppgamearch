@@ -1,0 +1,5 @@
+[project]
+site_name = "Pac-Man Tutorial"
+
+# This tells Zensical where to look for your content
+docs_dir = "."
