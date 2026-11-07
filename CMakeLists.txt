@@ -50,8 +50,11 @@ set(APPLE_METAL_LIBS
 add_executable(enumerator briefly/enumerator.cpp)
 
 # --- Define Your Apps cleanly ---
+add_executable(pacman apps/pacman/main.cpp)
+target_link_libraries(pacman PRIVATE SDL3::SDL3)
+
 add_executable(tetris apps/tetris/main.cpp)
-target_link_libraries(tetris PRIVATE ${APPLE_METAL_LIBS})
+target_link_libraries(tetris PRIVATE SDL3::SDL3)
 
 add_executable(gameloopclass apps/gameloopclass/main.cpp)
 
