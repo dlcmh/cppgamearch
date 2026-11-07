@@ -81,7 +81,8 @@ Checks: >
   -cppcoreguidelines-avoid-magic-numbers,
   -readability-magic-numbers,
   -readability-identifier-length,
-  -modernize-use-designated-initializers
+  -modernize-use-designated-initializers,
+  -cppcoreguidelines-pro-type-vararg
 
 WarningsAsErrors: >
   cppcoreguidelines-owning-memory,
