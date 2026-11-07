@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "build": "zensical build",
+    "deploy": "npm run build && wrangler pages deploy --commit-dirty=true"
+  }
+}

@@ -3,6 +3,9 @@
 # Tech stack: macOS, C++23, SDL3, Metal-cpp, Slang, GLM
 # ============================================
 
+# Wrangler
+.wrangler/
+
 # Zensical default build output directory
 site/
 
