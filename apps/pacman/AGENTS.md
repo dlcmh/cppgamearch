@@ -10,11 +10,11 @@ The tutorial is the product. Complete, runnable code lives inside the chapter pa
 
 ## Current status
 
-- Written and published: `tutorial/index.md` (introduction) and `tutorial/01-window.md` (Chapter 1).
-- Repository state: there is **no** `apps/pacman/main.cpp` and **no** `pacman` target in the root `CMakeLists.txt`. The reader creates both in Chapter 1.
-- Chapter 1's complete listing has been compiled and smoke-tested in a disposable project outside this repository.
-- Planned but **not written**: Chapters 2–9. Do not create placeholder pages for them. Add a page only when its chapter is written.
-- The next chapter to write is Chapter 2, "Drawing the Maze", unless the user asks for something else.
+- Written and published: `tutorial/index.md` (introduction), `tutorial/01-window.md` (Chapter 1), and `tutorial/02-maze.md` (Chapter 2).
+- The tutorial itself ships no game source. The reader creates `apps/pacman/main.cpp` and the `pacman` target in Chapter 1. An in-progress source file and target currently exist in this working copy from outside the tutorial workflow; leave them alone and do not treat them as reference code.
+- The complete listings for Chapters 1 and 2 have been compiled and smoke-tested in disposable projects outside this repository.
+- Planned but **not written**: Chapters 3–9. Do not create placeholder pages for them. Add a page only when its chapter is written.
+- The next chapter to write is Chapter 3, "Pac-Man Moves", unless the user asks for something else.
 
 ## Version control
 
@@ -108,7 +108,7 @@ Each chapter is a runnable checkpoint. File names are flat and follow the `NN-to
 
 **1. A Window Into the Maze (written).** The reader installs Homebrew LLVM, CMake, and SDL3; creates `apps/pacman/main.cpp` and adds the `pacman` target to the root `CMakeLists.txt`. The chapter explains CMake targets, the SDL window/renderer/event-loop model, RAII, `unique_ptr` custom deleters, VSync, and clean shutdown. End with a working window and a clean build in the reader's own checkout.
 
-**2. Drawing the Maze.** Introduce the 28 × 21 text map, tile constants, coordinate conversion, and per-tile drawing. Draw walls, pellets, and power pellets. No Pac-Man or ghosts yet. The window and loop stay unchanged. End with the maze on screen.
+**2. Drawing the Maze (written).** Introduce the 28 × 21 text map, tile constants, coordinate conversion, and per-tile drawing. Draw walls, pellets, and power pellets. No Pac-Man or ghosts yet. The window and loop stay unchanged. End with the maze on screen.
 
 **3. Pac-Man Moves.** Add a Pac-Man entity and keyboard input. Introduce delta time, direction buffering, grid-step movement, wall collision, tunnel wrapping, and mouth animation. Pac-Man should feel responsive, not square-by-square. No pellets are eaten yet.
 
@@ -202,7 +202,7 @@ Then open the URL Zensical prints (usually around 8000).
 ## Do not
 
 - **Do not add Pac-Man source code to this repository.** No `main.cpp`, no headers, no game-level `CMakeLists.txt`, and no `pacman` target. The student writes these; the tutorial teaches them.
-- Do not add chapters 2–9 without being asked. This file describes the plan; it does not authorize jumping ahead.
+- Do not add chapters 3–9 without being asked. This file describes the plan; it does not authorize jumping ahead.
 - Do not add placeholder pages, empty nav entries, or links to unpublished chapters.
 - Do not add a new library, game asset, or platform dependency without approval.
 - Do not split the game into multiple files during the tutorial.

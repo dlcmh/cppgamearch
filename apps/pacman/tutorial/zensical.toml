@@ -5,7 +5,7 @@ docs_dir = "."
 
 nav = [
     { "Introduction" = "index.md" },
-    { "Chapters" = [{ "1. A Window Into the Maze" = "01-window.md" }] },
+    { "Chapters" = [{ "1. A Window Into the Maze" = "01-window.md" }, { "2. Drawing the Maze" = "02-maze.md" }] },
 ]
 
 [project.theme]

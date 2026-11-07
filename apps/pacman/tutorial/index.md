@@ -64,7 +64,7 @@ The complete code for each chapter is printed in the chapter itself. This reposi
 | - | ------- | --------- | ---------- |
 | — | **Introduction** *(you are here)* | A map of the journey | What the game will be, and how to learn from it |
 | 1 | **[A Window Into the Maze](01-window.md)** | A window that opens and closes cleanly | SDL3, CMake, the game loop, RAII |
-| 2 | Drawing the Maze | The maze, walls, and pellets | Text maps, tile grids, coordinate math |
+| 2 | **[Drawing the Maze](02-maze.md)** | The maze, walls, and pellets | Text maps, tile grids, coordinate math |
 | 3 | Pac-Man Moves | A controllable Pac-Man | Input, delta time, collision, tunnels |
 | 4 | Pellets and Score | Eating, scoring, and a win condition | State, counters, on-screen text |
 | 5 | Four Ghosts | A ghost house and four residents | Entities, spawning, movement |
@@ -73,7 +73,7 @@ The complete code for each chapter is printed in the chapter itself. This reposi
 | 8 | The Complete Game | Ready, game over, win, restart | A full game state machine |
 | 9 | Beyond the Maze | Ideas for your next version | Fruit, sound, levels, refactoring |
 
-Chapters are linked here as they are published. The plan is complete; the writing is in progress. Chapter 1 is ready now.
+Chapters are linked here as they are published. The plan is complete; the writing is in progress. Chapters 1 and 2 are ready now.
 
 ## The shape of the finished game
 

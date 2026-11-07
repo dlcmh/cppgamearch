@@ -600,7 +600,7 @@ Those pieces — a resource-safe lifetime, an event-driven loop, and a present s
 
 ## 11. What's next
 
-Right now the renderer clears a dark rectangle. In **Chapter 2: Drawing the Maze**, we will give it something to draw:
+Right now the renderer clears a dark rectangle. In **[Chapter 2: Drawing the Maze](02-maze.md)**, we will give it something to draw:
 
 - Store the maze as a small grid of characters.
 - Turn tile coordinates into pixels.
