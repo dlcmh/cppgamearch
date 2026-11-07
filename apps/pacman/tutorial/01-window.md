@@ -205,6 +205,9 @@ class SdlGuard {
 };
 ~~~
 
+!!! note "The namespace is still open"
+    The `namespace {` at the top of this snippet does not close yet. It also wraps the pointer helpers in the next section, and the matching `} // namespace` appears after them. The complete listing later in the chapter shows the closed result.
+
 Let's read it carefully.
 
 The constructor's initializer list calls `SDL_Init(SDL_INIT_VIDEO)` and stores the result in `initialized_`. We ask for the **video subsystem** only; we are not using audio or game controllers yet. If initialization fails, we log SDL's explanation.
@@ -222,7 +225,7 @@ Copying and moving are deleted. Two `SdlGuard` objects would both think they own
 
 The SDL library is initialized, but we still need a window and a renderer. SDL hands those back as raw pointers. A plain `std::unique_ptr` would try to `delete` them, which is wrong: SDL has its own destroy functions.
 
-A **deleter** is a tiny function object that tells `unique_ptr` what to call instead:
+Still inside the anonymous namespace, we add a **deleter**: a tiny function object that tells `unique_ptr` what to call instead.
 
 ~~~cpp
 struct WindowDeleter {
