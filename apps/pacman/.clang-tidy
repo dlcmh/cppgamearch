@@ -1,0 +1,19 @@
+Checks: >
+  -*,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -modernize-use-trailing-return-type,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -modernize-use-designated-initializers,
+  -cppcoreguidelines-pro-type-vararg
+
+
+WarningsAsErrors: >
+  cppcoreguidelines-owning-memory,
+  modernize-make-unique,
+  modernize-make-shared,
+  modernize-use-using
