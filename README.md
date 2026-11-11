@@ -53,7 +53,7 @@ After setting up a game's folder with `CMakeLists.txt`, do the following one-tim
 ```sh
 # run this if:
 # build folder deleted
-# compile_commands.json needs to regenerated
+# compile_commands.json needs to regenerated (a minimal .cpp file needs to exist first for a compile action such as `add_executable` to trigger the creation of this file)
 # a new executable is added (which needs compile_commands.json to be regenerated)
 cmake -B build
 ```
@@ -62,6 +62,7 @@ In `.vscode/settings.json`:
 
 ```json
 {
+    "clangd.path": "/opt/homebrew/opt/llvm/bin/clangd",
     "clangd.arguments": [
         "--compile-commands-dir=build"
     ]
